@@ -102,7 +102,10 @@ class ConfluenceRenderer(mistune.Renderer):
         body_tag = ConfluenceTag("plain-text-body", cdata=True)
         body_tag.text = text
         return body_tag
-
+    def rich_text_body(self, text):
+        body_tag = ConfluenceTag("rich-text-body", cdata=False)
+        body_tag.text = text
+        return body_tag
     def link(self, link, title, text):
         parsed_link = urlparse(link)
         if (
