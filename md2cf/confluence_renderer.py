@@ -2,7 +2,7 @@ import uuid
 from pathlib import Path
 from typing import List, NamedTuple
 from urllib.parse import unquote, urlparse
-
+import re
 import mistune
 
 
@@ -160,3 +160,14 @@ class ConfluenceRenderer(mistune.Renderer):
         root_element.append(url_tag)
 
         return root_element.render()
+    def block_quote(self, body) -> str:
+        p = re.compile(r'<p>\[\!(?P<anchor>.+)\](?P<title>.+)<\/p>(?P<body>[\S\n ]+)')
+        m = p.search(body)
+
+        if m:
+            root_element = self.structured_macro("expand")
+            root_element.append(self.parameter(name="title", value=m.group("title")))
+            root_element.append(self.rich_text_body(m.group("body")))
+            return root_element.render()
+        else:
+            return '<blockquote>%s\n</blockquote>\n' % body.rstrip('\n')
